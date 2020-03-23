@@ -1,0 +1,54 @@
+{% extends "blog/base.html" %}
+{% block title %}{{ post.title }}{% endblock %}
+{% block content %}
+<h1>{{ post.title }}</h1>
+<p class="date">Published {{ post.publish }} by {{ post.author }}</p>
+{{ post.body|linebreaks }}
+<p>
+   <a class='btn btn-primary ' href="{% url 'blog:post_share' post.id %}" role='button'>Share this post</a>
+</p>
+<h3>Similar posts</h3>
+
+{% for post in similar_posts %}
+<a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+<br>
+{% endfor %}
+
+{% with comments.count as total_comments %}
+<h2>{{ total_comments }} comment{{ total_comments|pluralize }}</h2>
+{% endwith %}
+
+{% for comment in comments %}
+<div class="comment">
+   <p>
+      Comment {{ forloop.counter }} by {{ comment.name }}
+      {{ comment.created }}
+
+   </p>
+   <h3>{{ comment.body|linebreaks }}</h3>
+</div>
+{% empty %}
+<p>There is no comments yet</p>
+{% endfor %}
+
+{% if new_comment %}
+<h2>Your comment has been added.</h2>
+{% else %}
+<h2>Add a new comment</h2>
+<form action="." method="post">
+   <div class="container-fluid">
+      <div class="row">
+         <div class="col-md-3">
+            <div class="form-group">
+               {{ comment_form.as_p }}
+               {% csrf_token %}
+               
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+         </div>
+      </div>
+   </div>
+</form>
+
+{% endif %}
+{% endblock %}
